@@ -5,36 +5,50 @@ import bcrypt from "bcryptjs";
 const UserSchema = new mongoose.Schema(
     {
         name: {
-            type:String,
-            required:true,
-            trim:true,
+            type: String,
+            required: true,
+            trim: true,
         },
 
-        email:{
-            type:String,
-            required:true,
-            trim:true,
-            unique:true,
-            lowercase:true,
+        email: {
+            type: String,
+            required: true,
+            trim: true,
+            unique: true,
+            lowercase: true,
         },
 
-        password:{
-            type:String,
-            required:true,
+        password: {
+            type: String,
+            required: true,
             minlength: 6,
+        },
+
+        otp: {
+            type: String,
+        },
+
+        otpExpires: {
+            type: Date,
+        },
+
+        isVerified: {
+            type: Boolean,
+            default: false,
+        },
+
+        otpResendCooldown: {
+            type: Date,
         },
     },
     {
-        timestamps:true,
+        timestamps: true,
     },
 
-    UserSchema.pre("save",async function (next) {
-        if(!this.isModified("password")) return next();
-        this.password =await bcrypt.hash(this.password,10);
-        next();
-    })
-
 );
-
-const User=mongoose.model("User",UserSchema);
+UserSchema.pre("save", async function () {
+    if (!this.isModified("password")) return;
+    this.password = await bcrypt.hash(this.password, 10);
+})
+const User = mongoose.model("User", UserSchema);
 export default User;
